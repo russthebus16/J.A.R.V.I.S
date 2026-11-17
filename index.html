@@ -1,1 +1,287 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J.A.R.V.I.S.</title>
+<style>
+:root {
+  --bg:#050b14;
+  --panel:#0b1725;
+  --blue:#38cfff;
+  --muted:#7695a9;
+  --line:#16384b;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:radial-gradient(ellipse at top,#10283b,#050b14 65%);
+  color:#e8f8ff;
+  font-family:Arial,sans-serif;
+  min-height:100vh;
+}
+header {
+  padding:22px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.brand {
+  color:var(--blue);
+  letter-spacing:5px;
+  font-size:21px;
+  font-weight:bold;
+}
+.status {font-size:11px;color:#72e8ba}
+main {
+  max-width:1100px;
+  margin:auto;
+  padding:25px 16px;
+}
+h2 {
+  font-size:12px;
+  letter-spacing:3px;
+  color:var(--muted);
+  font-weight:normal;
+}
+.center {text-align:center}
+.reactor {
+  width:210px;
+  height:210px;
+  margin:25px auto;
+  border:2px solid var(--blue);
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  position:relative;
+  box-shadow:0 0 35px #168fc866,inset 0 0 30px #168fc833;
+  animation:pulse 3s infinite;
+}
+.reactor:before,.reactor:after {
+  content:"";
+  position:absolute;
+  border:1px solid #38cfff88;
+  border-radius:50%;
+}
+.reactor:before {inset:14px}
+.reactor:after {inset:32px}
+.core {
+  font-size:35px;
+  color:var(--blue);
+  z-index:1;
+  letter-spacing:5px;
+}
+@keyframes pulse {
+  50% {box-shadow:0 0 55px #168fc899,inset 0 0 45px #168fc855}
+}
+.grid {
+  display:grid;
+  grid-template-columns:1fr 2fr 1fr;
+  gap:14px;
+}
+.panel {
+  background:#0b1725dd;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:17px;
+}
+.stat {
+  color:var(--blue);
+  font-size:13px;
+  margin-top:13px;
+}
+.chat {
+  height:310px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:12px 0;
+}
+.message {
+  padding:12px;
+  border-radius:9px;
+  background:#12283a;
+  font-size:14px;
+  line-height:1.5;
+}
+.message.user {background:#10334a}
+.controls {
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+input {
+  min-width:0;
+  flex:1;
+  background:#06101b;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:13px;
+  color:white;
+}
+button {
+  background:#087eaa;
+  color:white;
+  border:1px solid #38cfff88;
+  border-radius:8px;
+  padding:12px 15px;
+  cursor:pointer;
+}
+button:hover {background:#0b9acb}
+.voice {margin:15px auto}
+footer {
+  text-align:center;
+  color:#577487;
+  font-size:11px;
+  padding:25px;
+}
+@media(max-width:750px) {
+  .grid {grid-template-columns:1fr}
+  .reactor {width:170px;height:170px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">J.A.R.V.I.S.</div>
+  <div class="status">● SYSTEM ONLINE</div>
+</header>
+
+<main>
+  <div class="center">
+    <h2>JUST A RATHER VERY INTELLIGENT SYSTEM</h2>
+    <div class="reactor">
+      <div class="core">J.A.R.V.I.S.</div>
+    </div>
+    <div id="systemMessage">Awaiting your command.</div>
+    <button class="voice" id="voiceButton" onclick="startVoice()">🎙 ACTIVATE VOICE</button>
+  </div>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>SYSTEM STATUS</h2>
+      <div class="stat">● Interface: ONLINE</div>
+      <div class="stat">● Voice: READY</div>
+      <div class="stat">● AI Brain: NOT CONNECTED</div>
+      <div class="stat">● Memory: LOCAL</div>
+    </section>
+
+    <section class="panel">
+      <h2>JARVIS COMMUNICATION</h2>
+      <div class="chat" id="chat">
+        <div class="message">
+          Good evening. JARVIS interface initialized.
+          My AI connection is not configured yet.
+          How may I assist you?
+        </div>
+      </div>
+      <div class="controls">
+        <input id="command" placeholder="Enter a command..." />
+        <button onclick="sendMessage()">SEND</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>PROJECTS</h2>
+      <div class="stat">01 / JARVIS AI</div>
+      <div class="stat">02 / DEVELOPMENT</div>
+      <div class="stat">03 / AUTOMATION</div>
+      <h2 style="margin-top:25px">CORE</h2>
+      <div class="stat">Version 1.0</div>
+    </section>
+  </div>
+</main>
+
+<footer>J.A.R.V.I.S. // PERSONAL AI CONTROL SYSTEM</footer>
+
+<script>
+const chat = document.getElementById("chat");
+const input = document.getElementById("command");
+const systemMessage = document.getElementById("systemMessage");
+
+function addMessage(text,type) {
+  const div = document.createElement("div");
+  div.className = "message " + type;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.rate = 0.95;
+  speech.pitch = 0.9;
+  speechSynthesis.speak(speech);
+}
+
+function respond(command) {
+  const c = command.toLowerCase();
+  if (c.includes("hello") || c.includes("hi")) {
+    return "Hello. JARVIS systems are operational. How can I help?";
+  }
+  if (c.includes("your name")) {
+    return "I am JARVIS, your personal AI interface.";
+  }
+  if (c.includes("time")) {
+    return "The current time is " + new Date().toLocaleTimeString();
+  }
+  if (c.includes("date")) {
+    return "Today's date is " + new Date().toLocaleDateString();
+  }
+  if (c.includes("status")) {
+    return "The dashboard is online. My advanced AI brain is not connected yet.";
+  }
+  if (c.includes("thank")) {
+    return "You're welcome. Always ready to assist.";
+  }
+  return "Command received. My advanced AI brain has not been connected yet. That is one of our next upgrades.";
+}
+
+function sendMessage() {
+  const value = input.value.trim();
+  if (!value) return;
+  addMessage(value,"user");
+  input.value = "";
+  const answer = respond(value);
+  addMessage(answer,"");
+  systemMessage.textContent = "Command processed.";
+  speak(answer);
+}
+
+input.addEventListener("keydown",e=>{
+  if(e.key==="Enter") sendMessage();
+});
+
+function startVoice() {
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Recognition) {
+    systemMessage.textContent = "Voice recognition is not supported in this browser.";
+    return;
+  }
+  const recognition = new Recognition();
+  recognition.lang = "en-US";
+  recognition.onstart = () => {
+    systemMessage.textContent = "Listening for your command...";
+  };
+  recognition.onresult = e => {
+    input.value = e.results[0][0].transcript;
+    sendMessage();
+  };
+  recognition.onerror = () => {
+    systemMessage.textContent = "Voice recognition unavailable. Try typing.";
+  };
+  recognition.onend = () => {
+    if(systemMessage.textContent==="Listening for your command...") {
+      systemMessage.textContent = "Awaiting your command.";
+    }
+  };
+  recognition.start();
+}
+</script>
+</body>
+</html>
